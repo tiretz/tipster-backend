@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { jwtAccessSecret } from '../utils/constants';
 import { SigninDto } from './dto/signin.dto';
-import { Tokens } from './types/token.type';
+import { Tokens } from './types/token';
 import { SignupDto } from './dto/signup.dto';
 import { Role } from '@prisma/client';
 import { hashData } from 'src/utils/hashing';

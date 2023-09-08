@@ -1,12 +1,19 @@
-import { Role } from '@prisma/client';
+import { $Enums, Role, User as UserType } from '@prisma/client';
 
-export class User {
-  sub: number;
+export class User implements UserType {
+  id: number;
   email: string;
-  role: Role;
+  username: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  role: $Enums.Role;
+  jwt: string;
+  updatedAt: Date;
+  createdAt: Date;
 
-  constructor(sub: number, email: string, role: Role) {
-    this.sub = sub;
+  constructor(id: number, email: string, role: Role) {
+    this.id = id;
     this.email = email;
     this.role = role;
   }

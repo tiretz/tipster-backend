@@ -2,7 +2,7 @@ import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GetCurrentUserId } from 'src/common/decorators/get-current-user-id.decorator';
 import { SigninDto } from './dto/signin.dto';
-import { Tokens } from './types/token.type';
+import { Tokens } from './types/token';
 import { SignupDto } from './dto/signup.dto';
 import { Public } from 'src/common/decorators/public.decorator';
 

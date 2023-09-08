@@ -9,6 +9,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/user/entities/user.entity';
 import { Role } from '@prisma/client';
+import { Competition } from 'src/competition/entities/competition.entity';
 
 export enum Action {
   Manage = 'manage',
@@ -18,23 +19,28 @@ export enum Action {
   Delete = 'delete',
 }
 
-export type Subjects = InferSubjects<typeof User> | 'all';
+export type Subjects = InferSubjects<typeof User | typeof Competition> | 'all';
 
-export type AppAbilty = MongoAbility<[Action, Subjects]>;
+export type AppAbility = MongoAbility<[Action, Subjects]>;
 
 @Injectable()
 export class AbilityFactory {
   defineAbility(user: User) {
     const { can, build } = new AbilityBuilder(
-      createMongoAbility as unknown as AbilityClass<AppAbilty>,
+      createMongoAbility as unknown as AbilityClass<AppAbility>,
     );
 
+    // Admin
     if (user.role == Role.ADMIN) {
       can(Action.Manage, 'all');
     } else {
+      // User
       can(Action.Read, User);
-      can(Action.Update, User, { sub: user.sub });
-      can(Action.Delete, User, { sub: user.sub });
+      can(Action.Update, User, { id: user.id });
+      can(Action.Delete, User, { id: user.id });
+
+      // Competition
+      can(Action.Read, Competition);
     }
 
     return build({
