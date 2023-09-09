@@ -1,6 +1,12 @@
 import { Competition as CompetitionType } from '@prisma/client';
 import { Exclude } from 'class-transformer';
-import { IsDate, IsDateString, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsDate,
+  IsDateString,
+  IsNotEmpty,
+  IsString,
+} from 'class-validator';
 
 export class CreateCompetitionDto implements CompetitionType {
   @Exclude()
@@ -16,4 +22,6 @@ export class CreateCompetitionDto implements CompetitionType {
   @IsDateString()
   @IsNotEmpty()
   date: Date;
+  @IsBoolean()
+  isActive: boolean;
 }

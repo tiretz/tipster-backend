@@ -15,7 +15,6 @@ import { UpdateCompetitionDto } from './dto/update-competition.dto';
 import { Action, AppAbility } from 'src/ability/ability.factory';
 import { CheckPolicies } from 'src/common/decorators/policy.decorator';
 import { Competition } from './entities/competition.entity';
-import { User } from 'src/user/entities/user.entity';
 import { Request } from 'express';
 import { JwtUser } from 'src/auth/types/jwtUser';
 

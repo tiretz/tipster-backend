@@ -34,11 +34,12 @@ model User {
 }
 
 model Competition {
-  id      Int      @id @default(autoincrement())
-  name    String
-  info    String?
-  country String
-  date    DateTime @db.Date
+  id       Int      @id @default(autoincrement())
+  name     String
+  info     String?
+  country  String
+  date     DateTime @db.Date
+  isActive Boolean  @default(true)
 
   users UserCompetition[]
 

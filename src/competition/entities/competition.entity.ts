@@ -6,4 +6,5 @@ export class Competition implements CompetitionType {
   info: string;
   country: string;
   date: Date;
+  isActive: boolean;
 }

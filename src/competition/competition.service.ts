@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCompetitionDto } from './dto/create-competition.dto';
 import { UpdateCompetitionDto } from './dto/update-competition.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -83,6 +87,17 @@ export class CompetitionService {
   }
 
   async join(user: JwtUser, id: number) {
+    const competition = await this.prismaService.competition.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!competition) throw new NotFoundException('Competition not found!');
+
+    if (!competition.isActive)
+      throw new BadRequestException('Competition no longer active!');
+
     const alreadyJoined = await this.prismaService.userCompetition.findFirst({
       where: {
         userId: user.sub,
