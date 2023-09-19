@@ -2,26 +2,15 @@ import {
   AbilityBuilder,
   AbilityClass,
   ExtractSubjectType,
-  InferSubjects,
-  MongoAbility,
   createMongoAbility,
 } from '@casl/ability';
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/user/entities/user.entity';
-import { Role } from '@prisma/client';
 import { Competition } from 'src/competition/entities/competition.entity';
-
-export enum Action {
-  Manage = 'manage',
-  Create = 'create',
-  Read = 'read',
-  Update = 'update',
-  Delete = 'delete',
-}
-
-export type Subjects = InferSubjects<typeof User | typeof Competition> | 'all';
-
-export type AppAbility = MongoAbility<[Action, Subjects]>;
+import { AppAbility } from './types/appability.type';
+import { UserRole } from 'src/user/enums/role.enum';
+import { Subjects } from './types/subjects.type';
+import { Action } from './enums/action.enum';
 
 @Injectable()
 export class AbilityFactory {
@@ -31,7 +20,7 @@ export class AbilityFactory {
     );
 
     // Admin
-    if (user.role == Role.ADMIN) {
+    if (user.role == UserRole.ADMIN) {
       can(Action.Manage, 'all');
     } else {
       // User

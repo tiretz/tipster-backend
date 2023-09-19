@@ -1,3 +1,5 @@
+import { AppAbility } from './appability.type';
+
 interface IPolicyHandler {
   handle(ability: AppAbility): boolean;
 }

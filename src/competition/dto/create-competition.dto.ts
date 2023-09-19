@@ -1,14 +1,8 @@
-import { Competition as CompetitionType } from '@prisma/client';
-import { Exclude } from 'class-transformer';
-import {
-  IsBoolean,
-  IsDate,
-  IsDateString,
-  IsNotEmpty,
-  IsString,
-} from 'class-validator';
+import { Exclude, Type } from 'class-transformer';
+import { IsArray, IsBoolean, IsDateString, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { UserDto } from './user.dto';
 
-export class CreateCompetitionDto implements CompetitionType {
+export class CreateCompetitionDto {
   @Exclude()
   id: number;
   @IsString()
@@ -24,4 +18,9 @@ export class CreateCompetitionDto implements CompetitionType {
   date: Date;
   @IsBoolean()
   isActive: boolean;
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => UserDto)
+  users: UserDto[];
 }

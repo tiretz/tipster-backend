@@ -1,4 +1,3 @@
-import { Role } from '@prisma/client';
 import {
   IsEmail,
   IsEnum,
@@ -6,6 +5,7 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
+import { UserRole } from 'src/user/enums/role.enum';
 
 export class CreateUserDto {
   @IsEmail()
@@ -29,7 +29,7 @@ export class CreateUserDto {
     message: 'Length of password needs to be at least 6 characters!',
   })
   password: string;
-  @IsEnum(Role)
+  @IsEnum(UserRole)
   @IsNotEmpty()
-  role: Role;
+  role: UserRole;
 }
