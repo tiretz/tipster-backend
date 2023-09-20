@@ -18,6 +18,9 @@ export class Competition extends BaseEntity {
   @Column()
   date: Date;
 
+  @Column({ default: false })
+  isOpen: boolean;
+
   @Column({ default: true })
   isActive: boolean;
 

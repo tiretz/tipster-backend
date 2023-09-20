@@ -17,6 +17,8 @@ export class CreateCompetitionDto {
   @IsNotEmpty()
   date: Date;
   @IsBoolean()
+  isOpen: boolean;
+  @IsBoolean()
   isActive: boolean;
   @IsOptional()
   @IsArray()

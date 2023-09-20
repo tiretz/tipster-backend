@@ -36,6 +36,7 @@ export class CompetitionService {
       date: createCompetitionDto.date,
       info: createCompetitionDto.info,
       isActive: createCompetitionDto.isActive,
+      isOpen: createCompetitionDto.isOpen,
       name: createCompetitionDto.name,
       users,
     });
@@ -66,8 +67,8 @@ export class CompetitionService {
     competition.country = updateCompetitionDto.country || undefined;
     competition.date = updateCompetitionDto.date || undefined;
     competition.info = updateCompetitionDto.info || undefined;
-    competition.isActive =
-      typeof updateCompetitionDto.isActive === 'boolean' ? updateCompetitionDto.isActive : undefined;
+    competition.isActive = typeof updateCompetitionDto.isActive === 'boolean' ? updateCompetitionDto.isActive : undefined;
+    competition.isOpen = typeof updateCompetitionDto.isOpen === 'boolean' ? updateCompetitionDto.isOpen : undefined;
     competition.name = updateCompetitionDto.name || undefined;
 
     const users = updateCompetitionDto.users
@@ -93,7 +94,7 @@ export class CompetitionService {
     return this.competitionRepository.remove(competition);
   }
 
-  async join(jwtUser: JwtUser, id: number): Promise<Competition> {
+  async join(id: number, jwtUser: JwtUser): Promise<Competition> {
     const competition = await this.findOne(id);
 
     if (!competition.isActive) throw new BadRequestException('Competition no longer active');
@@ -111,7 +112,7 @@ export class CompetitionService {
     return competition.save();
   }
 
-  async leave(jwtUser: JwtUser, id: number): Promise<Competition> {
+  async leave(id: number, jwtUser: JwtUser): Promise<Competition> {
     const competition = await this.findOne(id);
 
     const isInCompetition = competition.users.find((value: User, index: number, obj: User[]) => {
@@ -121,6 +122,42 @@ export class CompetitionService {
     if (!isInCompetition) throw new BadRequestException('User not in competition');
 
     const userToRemove = await this.userService.findOne(jwtUser.sub);
+
+    competition.users = competition.users.filter((user: User) => {
+      return user.id !== userToRemove.id;
+    });
+
+    return competition.save();
+  }
+
+  async add(id: number, dtoUser: UserDto): Promise<Competition> {
+    const competition = await this.findOne(id);
+
+    if (!competition.isActive) throw new BadRequestException('Competition no longer active');
+
+    const alreadyJoined = competition.users.find((value: User, index: number, obj: User[]) => {
+      return (value.id = dtoUser.id);
+    });
+
+    if (alreadyJoined) throw new BadRequestException('Already joined competition');
+
+    const user = await this.userService.findOne(dtoUser.id);
+
+    competition.users.push(user);
+
+    return competition.save();
+  }
+
+  async remove(id: number, dtoUser: UserDto): Promise<Competition> {
+    const competition = await this.findOne(id);
+
+    const isInCompetition = competition.users.find((value: User, index: number, obj: User[]) => {
+      return (value.id = dtoUser.id);
+    });
+
+    if (!isInCompetition) throw new BadRequestException('User not in competition');
+
+    const userToRemove = await this.userService.findOne(dtoUser.id);
 
     competition.users = competition.users.filter((user: User) => {
       return user.id !== userToRemove.id;

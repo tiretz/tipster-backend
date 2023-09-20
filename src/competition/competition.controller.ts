@@ -19,6 +19,7 @@ import { Request } from 'express';
 import { JwtUser } from 'src/auth/types/jwtUser';
 import { AppAbility } from 'src/ability/types/appability.type';
 import { Action } from 'src/ability/enums/action.enum';
+import { UserDto } from './dto/user.dto';
 
 @Controller('competitions')
 export class CompetitionController {
@@ -64,7 +65,7 @@ export class CompetitionController {
 
     if (!user) throw new BadRequestException();
 
-    return this.competitionService.join(user, id);
+    return this.competitionService.join(id, user);
   }
 
   @Post(':id/leave')
@@ -74,6 +75,18 @@ export class CompetitionController {
 
     if (!user) throw new BadRequestException();
 
-    return this.competitionService.leave(user, id);
+    return this.competitionService.leave(id, user);
+  }
+
+  @Post(':id/add')
+  @CheckPolicies((ability: AppAbility) => ability.can(Action.Manage, Competition))
+  async add(@Param('id', ParseIntPipe) id: number, @Body() user: UserDto): Promise<Competition> {
+    return this.competitionService.add(id, user);
+  }
+
+  @Post(':id/remove')
+  @CheckPolicies((ability: AppAbility) => ability.can(Action.Manage, Competition))
+  async remove(@Param('id', ParseIntPipe) id: number, @Body() user: UserDto): Promise<Competition> {
+    return this.competitionService.remove(id, user);
   }
 }
