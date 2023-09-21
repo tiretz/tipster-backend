@@ -99,6 +99,8 @@ export class CompetitionService {
 
     if (!competition.isActive) throw new BadRequestException('Competition no longer active');
 
+    if (!competition.isOpen) throw new BadRequestException('Cannot join closed competition');
+
     const alreadyJoined = competition.users.find((value: User, index: number, obj: User[]) => {
       return (value.id = jwtUser.sub);
     });
@@ -114,6 +116,8 @@ export class CompetitionService {
 
   async leave(id: number, jwtUser: JwtUser): Promise<Competition> {
     const competition = await this.findOne(id);
+
+    if (!competition.isOpen) throw new BadRequestException('Cannot leave closed competition');
 
     const isInCompetition = competition.users.find((value: User, index: number, obj: User[]) => {
       return (value.id = jwtUser.sub);
@@ -135,6 +139,8 @@ export class CompetitionService {
 
     if (!competition.isActive) throw new BadRequestException('Competition no longer active');
 
+    if (!competition.isOpen) throw new BadRequestException('Cannot add user to closed competition');
+
     const alreadyJoined = competition.users.find((value: User, index: number, obj: User[]) => {
       return (value.id = dtoUser.id);
     });
@@ -150,6 +156,8 @@ export class CompetitionService {
 
   async remove(id: number, dtoUser: UserDto): Promise<Competition> {
     const competition = await this.findOne(id);
+
+    if (!competition.isOpen) throw new BadRequestException('Cannot remove user from closed competition');
 
     const isInCompetition = competition.users.find((value: User, index: number, obj: User[]) => {
       return (value.id = dtoUser.id);
