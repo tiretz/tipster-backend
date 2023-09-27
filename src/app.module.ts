@@ -9,6 +9,8 @@ import { PoliciesGuard } from './common/guards/policy.guard';
 import { TypeOrmModule, TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
+import { CompetitionConfigModule } from './competition-config/competition-config.module';
+import { CompetitionActionModule } from './competition-action/competition-action.module';
 
 @Module({
   imports: [
@@ -42,6 +44,8 @@ import { DataSource } from 'typeorm';
     UserModule,
     AbilityModule,
     CompetitionModule,
+    CompetitionConfigModule,
+    CompetitionActionModule,
   ],
   providers: [
     {

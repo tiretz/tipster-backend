@@ -1,9 +1,4 @@
-import {
-  AbilityBuilder,
-  AbilityClass,
-  ExtractSubjectType,
-  createMongoAbility,
-} from '@casl/ability';
+import { AbilityBuilder, AbilityClass, ExtractSubjectType, createMongoAbility } from '@casl/ability';
 import { Injectable } from '@nestjs/common';
 import { User } from 'src/user/entities/user.entity';
 import { Competition } from 'src/competition/entities/competition.entity';
@@ -11,13 +6,12 @@ import { AppAbility } from './types/appability.type';
 import { UserRole } from 'src/user/enums/role.enum';
 import { Subjects } from './types/subjects.type';
 import { Action } from './enums/action.enum';
+import { CompetitionConfig } from 'src/competition-config/entities/competition-config.entity';
 
 @Injectable()
 export class AbilityFactory {
   defineAbility(user: User) {
-    const { can, build } = new AbilityBuilder(
-      createMongoAbility as unknown as AbilityClass<AppAbility>,
-    );
+    const { can, build } = new AbilityBuilder(createMongoAbility as unknown as AbilityClass<AppAbility>);
 
     // Admin
     if (user.role == UserRole.ADMIN) {
@@ -30,11 +24,11 @@ export class AbilityFactory {
 
       // Competition
       can(Action.Read, Competition);
+      can(Action.Read, CompetitionConfig);
     }
 
     return build({
-      detectSubjectType: (item) =>
-        item.constructor as ExtractSubjectType<Subjects>,
+      detectSubjectType: (item) => item.constructor as ExtractSubjectType<Subjects>,
     });
   }
 }

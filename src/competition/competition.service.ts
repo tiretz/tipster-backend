@@ -1,21 +1,19 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCompetitionDto } from './dto/create-competition.dto';
 import { UpdateCompetitionDto } from './dto/update-competition.dto';
-import { JwtUser } from 'src/auth/types/jwtUser';
 import { Competition } from './entities/competition.entity';
 import { CompetitionRepository } from './repositories/competition.repository';
-import { User } from 'src/user/entities/user.entity';
-import { UserService } from 'src/user/user.service';
 import { UserRepository } from 'src/user/repositories/user.repository';
 import { In } from 'typeorm';
 import { UserDto } from './dto/user.dto';
+import { CompetitionConfigRepository } from 'src/competition-config/repositories/competition-config.repository';
 
 @Injectable()
 export class CompetitionService {
   constructor(
     private competitionRepository: CompetitionRepository,
+    private competitionConfigRepository: CompetitionConfigRepository,
     private userRepository: UserRepository,
-    private userService: UserService,
   ) {}
 
   async create(createCompetitionDto: CreateCompetitionDto): Promise<Competition> {
@@ -31,6 +29,10 @@ export class CompetitionService {
         })
       : undefined;
 
+    const newCompetitionConfig = this.competitionConfigRepository.create({});
+
+    await newCompetitionConfig.save();
+
     const newCompetition = this.competitionRepository.create({
       country: createCompetitionDto.country,
       date: createCompetitionDto.date,
@@ -39,13 +41,19 @@ export class CompetitionService {
       isOpen: createCompetitionDto.isOpen,
       name: createCompetitionDto.name,
       users,
+      config: newCompetitionConfig,
     });
 
     return newCompetition.save();
   }
 
   async findAll(): Promise<Competition[]> {
-    return this.competitionRepository.find();
+    return this.competitionRepository.find({
+      relations: {
+        users: true,
+        config: true,
+      },
+    });
   }
 
   async findOne(id: number): Promise<Competition> {
@@ -53,6 +61,7 @@ export class CompetitionService {
       where: { id },
       relations: {
         users: true,
+        config: true,
       },
     });
 
@@ -92,85 +101,5 @@ export class CompetitionService {
     const competition = await this.findOne(id);
 
     return this.competitionRepository.remove(competition);
-  }
-
-  async join(id: number, jwtUser: JwtUser): Promise<Competition> {
-    const competition = await this.findOne(id);
-
-    if (!competition.isActive) throw new BadRequestException('Competition no longer active');
-
-    if (!competition.isOpen) throw new BadRequestException('Cannot join closed competition');
-
-    const alreadyJoined = competition.users.find((value: User, index: number, obj: User[]) => {
-      return (value.id = jwtUser.sub);
-    });
-
-    if (alreadyJoined) throw new BadRequestException('Already joined competition');
-
-    const user = await this.userService.findOne(jwtUser.sub);
-
-    competition.users.push(user);
-
-    return competition.save();
-  }
-
-  async leave(id: number, jwtUser: JwtUser): Promise<Competition> {
-    const competition = await this.findOne(id);
-
-    if (!competition.isOpen) throw new BadRequestException('Cannot leave closed competition');
-
-    const isInCompetition = competition.users.find((value: User, index: number, obj: User[]) => {
-      return (value.id = jwtUser.sub);
-    });
-
-    if (!isInCompetition) throw new BadRequestException('User not in competition');
-
-    const userToRemove = await this.userService.findOne(jwtUser.sub);
-
-    competition.users = competition.users.filter((user: User) => {
-      return user.id !== userToRemove.id;
-    });
-
-    return competition.save();
-  }
-
-  async add(id: number, dtoUser: UserDto): Promise<Competition> {
-    const competition = await this.findOne(id);
-
-    if (!competition.isActive) throw new BadRequestException('Competition no longer active');
-
-    if (!competition.isOpen) throw new BadRequestException('Cannot add user to closed competition');
-
-    const alreadyJoined = competition.users.find((value: User, index: number, obj: User[]) => {
-      return (value.id = dtoUser.id);
-    });
-
-    if (alreadyJoined) throw new BadRequestException('Already joined competition');
-
-    const user = await this.userService.findOne(dtoUser.id);
-
-    competition.users.push(user);
-
-    return competition.save();
-  }
-
-  async remove(id: number, dtoUser: UserDto): Promise<Competition> {
-    const competition = await this.findOne(id);
-
-    if (!competition.isOpen) throw new BadRequestException('Cannot remove user from closed competition');
-
-    const isInCompetition = competition.users.find((value: User, index: number, obj: User[]) => {
-      return (value.id = dtoUser.id);
-    });
-
-    if (!isInCompetition) throw new BadRequestException('User not in competition');
-
-    const userToRemove = await this.userService.findOne(dtoUser.id);
-
-    competition.users = competition.users.filter((user: User) => {
-      return user.id !== userToRemove.id;
-    });
-
-    return competition.save();
   }
 }

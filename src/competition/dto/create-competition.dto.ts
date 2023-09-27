@@ -1,10 +1,8 @@
-import { Exclude, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsDateString, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { UserDto } from './user.dto';
 
 export class CreateCompetitionDto {
-  @Exclude()
-  id: number;
   @IsString()
   @IsNotEmpty()
   name: string;

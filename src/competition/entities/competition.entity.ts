@@ -1,5 +1,6 @@
+import { CompetitionConfig } from 'src/competition-config/entities/competition-config.entity';
 import { User } from 'src/user/entities/user.entity';
-import { BaseEntity, Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Competition extends BaseEntity {
@@ -27,4 +28,8 @@ export class Competition extends BaseEntity {
   @ManyToMany(() => User, (user) => user.competitions, { onDelete: 'CASCADE' })
   @JoinTable()
   users: User[];
+
+  @OneToOne(() => CompetitionConfig, { onDelete: 'RESTRICT' })
+  @JoinColumn()
+  config: CompetitionConfig;
 }
